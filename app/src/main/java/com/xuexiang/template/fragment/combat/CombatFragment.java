@@ -60,6 +60,7 @@ public class CombatFragment extends BaseFragment<FragmentCombatBinding> {
 
             @Override
             public void onClick(View v) {
+
                 openNewPage(ComprehensiveTest.class, ComprehensiveTest.KEY_TITLE_NAME, binding.button1.getText());
             }
         });

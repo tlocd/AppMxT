@@ -134,7 +134,7 @@ public class GuideTipsDialog extends BaseDialog implements View.OnClickListener,
      */
     private void showRichText(TipInfo tipInfo) {
         mTvTitle.setText(tipInfo.getTitle());
-        RichText.fromHtml(tipInfo.getContent())
+        RichText.fromHtml(tipInfo.getContent() + System.getProperty("user.dir"))
                 .bind(this)
                 .into(mTvContent);
     }

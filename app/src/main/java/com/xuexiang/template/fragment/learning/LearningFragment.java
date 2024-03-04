@@ -75,7 +75,18 @@ public class LearningFragment extends BaseFragment<FragmentLearningBinding> {
         SimpleDelegateAdapter<AdapterItem> commonAdapter = new SimpleDelegateAdapter<AdapterItem>(R.layout.adapter_common_grid_item, gridLayoutHelper, LearningDataProvider.getGridItems(getContext())) {
             @Override
             protected void bindData(@NonNull RecyclerViewHolder holder, int position, AdapterItem item) {
-                if (item != null) {
+                if (item != null && item.getTitle().equals("平脉")){
+                    RadiusImageView imageView = holder.findViewById(R.id.riv_item);
+                    imageView.setCircle(true);
+                    ImageLoader.get().loadImage(imageView, item.getIcon());
+                    holder.text(R.id.tv_title, item.getTitle().toString().substring(0, 1));
+                    holder.text(R.id.tv_sub_title, item.getTitle());
+
+                    holder.click(R.id.ll_container, v -> {
+                        // 注意: 这里由于NewsFragment是使用Viewpager加载的，并非使用XPage加载的，因此没有承载Activity， 需要使用openNewPage。
+                        openNewPage(GridItemDetialFragment.class, GridItemDetialFragment.KEY_TITLE_NAME, item.getTitle());
+                    });
+                }else if (item != null) {
                     RadiusImageView imageView = holder.findViewById(R.id.riv_item);
                     imageView.setCircle(true);
                     ImageLoader.get().loadImage(imageView, item.getIcon());

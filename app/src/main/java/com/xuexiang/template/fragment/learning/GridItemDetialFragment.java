@@ -4,6 +4,7 @@ import static com.xuexiang.xutil.app.AppUtils.getPackageName;
 
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
@@ -64,8 +65,24 @@ public class GridItemDetialFragment extends BaseFragment<FragmentGridItemDetailB
         } else {
             for (MaiXiang maiXiang: maiXiangList){
                 if (maiXiang.getName().equals(title)){
-                    binding.maixiangFeature.setText(maiXiang.getMaixiangFeature());
-                    binding.mainDisease.setText(maiXiang.getMainDisease());
+                    if (title.equals("洪脉")){
+                        binding.maixiangFeature.setText(maiXiang.getMaixiangFeature());
+                        binding.mainDisease.setText(maiXiang.getMainDisease());
+                        binding.mainDiseaseTitleTwo.setVisibility(View.VISIBLE);
+                        binding.maixiangFeatureTitleTwo.setVisibility(View.VISIBLE);
+                        binding.titleTwo.setVisibility(View.VISIBLE);
+                        binding.titleTwo.setText(maiXiang.getNametwo());
+                        binding.maixiangFeatureTwo.setVisibility(View.VISIBLE);
+                        binding.maixiangFeatureTwo.setText(maiXiang.getMaixiangfeaturetwo());
+                        binding.mainDiseaseTwo.setVisibility(View.VISIBLE);
+                        binding.mainDiseaseTwo.setText(maiXiang.getMaindiseasetwo());
+                    } else if (title.equals("平脉")) {
+                        binding.maixiangFeature.setText(maiXiang.getMaixiangFeature());
+                        binding.mainDiseaseTitle.setVisibility(View.GONE);
+                    } else {
+                        binding.maixiangFeature.setText(maiXiang.getMaixiangFeature());
+                        binding.mainDisease.setText(maiXiang.getMainDisease());
+                    }
                     break;
                 }
             }
