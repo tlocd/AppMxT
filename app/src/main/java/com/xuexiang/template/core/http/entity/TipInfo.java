@@ -5,11 +5,6 @@ import androidx.annotation.Keep;
 @Keep
 public class TipInfo {
 
-    /**
-     * title :
-     * content :
-     */
-
     private String title;
     private String content;
 

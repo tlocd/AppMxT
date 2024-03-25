@@ -19,9 +19,7 @@ package com.xuexiang.template;
 
 import android.app.Application;
 import android.content.Context;
-
 import androidx.multidex.MultiDex;
-
 import com.xuexiang.template.utils.sdkinit.ANRWatchDogInit;
 import com.xuexiang.template.utils.sdkinit.UMengInit;
 import com.xuexiang.template.utils.sdkinit.XBasicLibInit;

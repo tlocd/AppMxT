@@ -23,8 +23,6 @@ public final class TokenUtils {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    private static final String KEY_PROFILE_CHANNEL = "github";
-
     /**
      * 初始化Token信息
      */
@@ -59,8 +57,8 @@ public final class TokenUtils {
     public static boolean handleLoginSuccess(String token) {
         if (!StringUtils.isEmpty(token)) {
             XToastUtils.success("登录成功！");
-            MobclickAgent.onProfileSignIn(KEY_PROFILE_CHANNEL, token);
-            setToken(token);
+//            MobclickAgent.onProfileSignIn(KEY_PROFILE_CHANNEL, token);
+//            setToken(token);
             return true;
         } else {
             XToastUtils.error("登录失败！");

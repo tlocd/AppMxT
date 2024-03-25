@@ -6,12 +6,11 @@
     android:background="@color/xui_config_color_white"
     android:orientation="vertical">
 
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp" />
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 
     <TextView
         style="@style/InfoItem.Account"
@@ -140,6 +139,7 @@
 
         <!-- 第一个按钮 -->
         <Button
+            android:id="@+id/button1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -153,6 +153,7 @@
 
         <!-- 第二个按钮 -->
         <Button
+            android:id="@+id/button2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

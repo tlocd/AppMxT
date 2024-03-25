@@ -5,6 +5,7 @@ import android.view.KeyEvent;
 
 import com.xuexiang.template.core.BaseActivity;
 import com.xuexiang.template.fragment.other.LoginFragment;
+import com.xuexiang.template.fragment.other.LoginPwdFragment;
 import com.xuexiang.xui.utils.KeyboardUtils;
 import com.xuexiang.xui.utils.StatusBarUtils;
 import com.xuexiang.xutil.display.Colors;

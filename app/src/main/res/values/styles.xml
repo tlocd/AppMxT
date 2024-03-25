@@ -16,9 +16,7 @@
     </style>
 
     <style name="AppTheme.Launch">
-        <item name="xui_config_color_splash_bg">@color/xui_config_color_white</item>
-        <item name="xui_config_app_logo_bottom">@dimen/xui_config_app_logo_bottom</item>
-        <item name="xui_config_company_logo_bottom">@dimen/xui_config_company_logo_bottom</item>
+        <item name="xui_config_color_splash_bg">@color/xui_config_color_foremost_background</item>
         <item name="android:windowBackground">@drawable/xui_config_bg_splash</item>
         <item name="android:windowFullscreen">true</item>
     </style>
@@ -27,7 +25,7 @@
     <style name="AppTheme.Launch.App">
         <!--注意修改图标-->
         <item name="xui_config_splash_app_logo">@drawable/ic_splash_app_logo_xui</item>
-        <item name="xui_config_splash_company_logo">@drawable/ic_splash_company_logo</item>
+<!--        <item name="xui_config_splash_company_logo">@drawable/ic_splash_company_logo</item>-->
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

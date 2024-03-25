@@ -1,35 +1,26 @@
-/*
- * Copyright (C) 2021 xuexiangjys(xuexiangjys@163.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 package com.xuexiang.template.fragment.other;
+import static android.content.ContentValues.TAG;
+import static com.xuexiang.template.config.Config.baseUrl;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.xuexiang.template.R;
 import com.xuexiang.template.activity.MainActivity;
 import com.xuexiang.template.core.BaseFragment;
 import com.xuexiang.template.databinding.FragmentLoginBinding;
+import com.xuexiang.template.utils.MQTT;
+import com.xuexiang.template.utils.NetworkUtils;
 import com.xuexiang.template.utils.RandomUtils;
+import com.xuexiang.template.utils.Response;
 import com.xuexiang.template.utils.SettingUtils;
 import com.xuexiang.template.utils.TokenUtils;
 import com.xuexiang.template.utils.Utils;
@@ -45,16 +36,17 @@ import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
 import com.xuexiang.xutil.app.ActivityUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Objects;
+
 
 /**
  * 登录页面
- *
- * @author xuexiang
- * @since 2019-11-17 22:15
  */
 @Page(anim = CoreAnim.none)
 public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements View.OnClickListener {
-
+    private String emailCode = null;
     private View mJumpView;
 
     private CountDownButtonHelper mCountDownHelper;
@@ -76,7 +68,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         mJumpView = titleBar.addAction(new TitleBar.TextAction(R.string.title_jump_login) {
             @Override
             public void performAction(View view) {
-                onLoginSuccess();
+                openPage(RegisterFragment.class);
             }
         });
         return titleBar;
@@ -99,13 +91,23 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
             SettingUtils.setIsAgreePrivacy(isChecked);
             refreshButton(isChecked);
         });
+
+        binding.tvLoginPwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openPage(LoginPwdFragment.class);
+                onDestroyView();
+            }
+        });
+
+        Intent serviceIntent = new Intent(this.getContext(), MQTT.class);
+        this.requireContext().startService(serviceIntent);
     }
 
     @Override
     protected void initListeners() {
         binding.btnGetVerifyCode.setOnClickListener(this);
         binding.btnLogin.setOnClickListener(this);
-        binding.tvOtherLogin.setOnClickListener(this);
         binding.tvForgetPassword.setOnClickListener(this);
         binding.tvUserProtocol.setOnClickListener(this);
         binding.tvPrivacyProtocol.setOnClickListener(this);
@@ -127,46 +129,55 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.btn_get_verify_code) {
-            if (binding.etPhoneNumber.validate()) {
-                getVerifyCode(binding.etPhoneNumber.getEditValue());
-            }
-        } else if (id == R.id.btn_login) {
+        if (id == R.id.btn_login) {
             if (binding.etPhoneNumber.validate()) {
                 if (binding.etVerifyCode.validate()) {
-                    loginByVerifyCode(binding.etPhoneNumber.getEditValue(), binding.etVerifyCode.getEditValue());
+                    try {
+                        login(binding.etPhoneNumber.getEditValue(), binding.etVerifyCode.getEditValue());
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
-        } else if (id == R.id.tv_other_login) {
-            XToastUtils.info("其他登录方式");
         } else if (id == R.id.tv_forget_password) {
             XToastUtils.info("忘记密码");
-        } else if (id == R.id.tv_user_protocol) {
+        }else if (id == R.id.tv_user_protocol) {
             Utils.gotoProtocol(this, false, true);
         } else if (id == R.id.tv_privacy_protocol) {
             Utils.gotoProtocol(this, true, true);
+        } else if (id == R.id.btn_get_verify_code) {
+            mCountDownHelper.start();
+            // 执行登录请求
+            String email = null;
+            if (binding.etPhoneNumber.validate()) {
+                email = binding.etPhoneNumber.getEditValue();
+            }
+            String urlString = null;
+            try {
+                urlString = baseUrl + "user/email?email=" + URLEncoder.encode(email, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            new EmailCodeTask().execute(urlString);
         }
 
     }
 
     /**
-     * 获取验证码
-     */
-    private void getVerifyCode(String phoneNumber) {
-        // TODO: 2020/8/29 这里只是界面演示而已
-        XToastUtils.warning("只是演示，验证码请随便输");
-        mCountDownHelper.start();
-    }
-
-    /**
      * 根据验证码登录
      *
-     * @param phoneNumber 手机号
-     * @param verifyCode  验证码
+     * @param email 邮箱
+     * @param password  密码
      */
-    private void loginByVerifyCode(String phoneNumber, String verifyCode) {
-        // TODO: 2020/8/29 这里只是界面演示而已
-        onLoginSuccess();
+    private void login(String email, String password) throws UnsupportedEncodingException {
+        // 执行登录请求
+        if (emailCode == null) {
+            XToastUtils.warning("请等待验证码到达!!!");
+        } else if (emailCode.equals(binding.etVerifyCode.getEditValue())) {
+            onLoginSuccess();
+        } else {
+            XToastUtils.warning("验证码错误!!!");
+        }
     }
 
     /**
@@ -188,7 +199,25 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         super.onDestroyView();
     }
 
+    private class EmailCodeTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            return NetworkUtils.performGetRequest(params[0]);
+        }
 
+        @Override
+        protected void onPostExecute(String result) {
+            Gson gson = new Gson();
+            Response response = gson.fromJson(result, Response.class);
+            if (response.getCode() == 200) {
+                Log.d(TAG, "验证码" + response.getMessage());
+                emailCode = response.getMessage();
+            } else {
+                // 登录失败
+                XToastUtils.warning("请求失败，请稍后重试!!!" + response.getMessage());
+            }
+        }
+    }
 
 }
 
